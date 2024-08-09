@@ -11,6 +11,7 @@
 function(setAppOptions item library_list)
     # Set common compile definition
     target_compile_definitions(${item} PRIVATE ${COMMON_COMPILE_DEF})
+    target_compile_options(${item} PRIVATE "${AREG_OPT_DISABLE_WARN_COMMON}")
 
     # Linking flags
     target_link_libraries(${item} areg-extend ${library_list} areg ${AREG_EXTENDED_LIBS} ${AREG_LDFLAGS})
@@ -65,7 +66,8 @@ function(setStaticLibOptions item library_list)
 
     # Set common compile definition
     target_compile_definitions(${item} PRIVATE ${COMMON_COMPILE_DEF} _LIB)
-        target_compile_options(${item} PRIVATE  ${AREG_COMPILER_VERSION})
+    target_compile_options(${item} PRIVATE ${AREG_COMPILER_VERSION})
+    target_compile_options(${item} PRIVATE "${AREG_OPT_DISABLE_WARN_COMMON}")
 
     if (NOT ${AREG_DEVELOP_ENV} MATCHES "Win32")
         target_compile_options(${item} PRIVATE "-Bstatic")
@@ -128,6 +130,7 @@ function(addStaticLibEx_C target_name source_list library_list)
         list(APPEND library_list "${item}")
     endforeach()
     add_library(${target_name} STATIC ${source_list})
+    target_compile_options(${target_name} PRIVATE "${AREG_OPT_DISABLE_WARN_COMMON}")
 
     # Set common compile definition
     target_compile_definitions(${target_name} PRIVATE ${COMMON_COMPILE_DEF} _LIB)
@@ -168,6 +171,7 @@ endfunction(addStaticLib_C)
 function(setSharedLibOptions item library_list)
     # Set common compile definition
     target_compile_definitions(${item} PRIVATE ${COMMON_COMPILE_DEF} _USRDLL)
+    target_compile_options(${item} PRIVATE "${AREG_OPT_DISABLE_WARN_COMMON}")
 
     # Linking flags
     target_link_libraries(${item} areg-extend ${library_list} areg ${AREG_EXTENDED_LIBS} ${AREG_LDFLAGS})
@@ -244,7 +248,7 @@ endfunction(setSources)
 
 # ---------------------------------------------------------------------------
 # Description : This function is called to set the compiler short name such
-#               as 'g++', 'gcc', 'clang' or 'msvc', etc.
+#               as 'g++', 'gcc', 'clang', `clang-cl` or 'msvc', etc.
 # Function ...: findCompilerShortName
 # Parameters .: ${compiler_path}    -- The path to the compiler to guess the short name
 #               ${short_name_var}   -- The name of the variable to set the short name.
@@ -256,6 +260,12 @@ function(findCompilerShortName compiler_path short_name_var)
 
     set(FOUND_POS)
     set(${short_name_var} "unknown" PARENT_SCOPE)
+
+    string(FIND "${compiler_path}" "clang-cl" FOUND_POS REVERSE)
+    if (${FOUND_POS} GREATER -1)
+        set(${short_name_var} "clang-cl" PARENT_SCOPE)
+        return()
+    endif()
 
     string(FIND "${compiler_path}" "clang++" FOUND_POS REVERSE)
     if (${FOUND_POS} GREATER -1)
@@ -315,15 +325,21 @@ function(findCompilerFamilyName compiler_path family_var)
 
     set(FOUND_POS)
 
+    string(FIND "${compiler_path}" "clang-cl" FOUND_POS REVERSE)
+    if (${FOUND_POS} GREATER -1)
+        set(${family_var} "llvm" PARENT_SCOPE)
+        return()
+    endif()
+
     string(FIND "${compiler_path}" "clang++" FOUND_POS REVERSE)
     if (${FOUND_POS} GREATER -1)
-        set(${family_var} "clang" PARENT_SCOPE)
+        set(${family_var} "llvm" PARENT_SCOPE)
         return()
     endif()
 
     string(FIND "${compiler_path}" "clang" FOUND_POS REVERSE)
     if (${FOUND_POS} GREATER -1)
-        set(${family_var} "clang" PARENT_SCOPE)
+        set(${family_var} "llvm" PARENT_SCOPE)
         return()
     endif()
 
@@ -584,6 +600,7 @@ function(addServiceInterfaceEx gen_project_name source_root relative_path sub_di
     else()
         message(STATUS "Adding service interface library ${gen_project_name}")
         addStaticLib(${gen_project_name} "${proj_src}")
+        target_compile_options(${gen_project_name} PRIVATE "${AREG_OPT_DISABLE_WARN_CODEGEN}")
     endif()
 
 endfunction(addServiceInterfaceEx)

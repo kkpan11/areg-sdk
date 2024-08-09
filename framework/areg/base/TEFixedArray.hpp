@@ -173,7 +173,7 @@ public:
      *          There should be possibility to stream values and if VALUE is not a
      *          primitive, but an object, it should have implemented streaming operator.
      * \param   stream  The stream to write values.
-     * \param   input   The fixed array object containing value to stream.
+     * \param   output  The fixed array object containing value to stream.
      **/
     template<typename V>
     friend IEOutStream & operator << ( IEOutStream & stream, const TEFixedArray<V> & output );
@@ -265,9 +265,9 @@ public:
      *          should have comparing operators.
      * \param	elemSearch	The element to search.
      * \param	startAt	    The index to start searching.
-     * \return	If found, returns valid index of element in array. Otherwise, returns 0xFFFFFFFF.
+     * \return	If found, returns valid index of element in array. Otherwise, returns INVALID_INDEX aka -1.
      **/
-    inline uint32_t find(const VALUE& elemSearch, uint32_t startAt = 0) const;
+    inline int find(const VALUE& elemSearch, uint32_t startAt = 0) const;
 
     /**
      * \brief   Resize the array, set new length and copy existing data.
@@ -505,14 +505,14 @@ inline void TEFixedArray<VALUE>::move(TEFixedArray< VALUE > && src) noexcept
 }
 
 template< typename VALUE >
-inline uint32_t TEFixedArray<VALUE>::find(const VALUE& elemSearch, uint32_t startAt /* = 0 */) const
+inline int TEFixedArray<VALUE>::find(const VALUE& elemSearch, uint32_t startAt /* = 0 */) const
 {
-    uint32_t result = static_cast<uint32_t>(NECommon::INVALID_INDEX);
+    int32_t result = NECommon::INVALID_INDEX;
     for (uint32_t i = startAt; i < mElemCount; ++i)
     {
         if (elemSearch == mValueList[i])
         {
-            result = i;
+            result = static_cast<int32_t>(i);
             break;
         }
     }

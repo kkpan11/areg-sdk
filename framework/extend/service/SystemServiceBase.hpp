@@ -106,7 +106,7 @@ public:
      * \brief   Triggered when the system changes the service control state.
      *          This is operated via operating system and valid for Windows OS.
      *          In Linux OS this has no effect.
-     * \tparam  control     The control triggered by system.
+     * \param   control     The control triggered by system.
      **/
     void controlService(SystemServiceBase::eServiceControl control);
 
@@ -125,8 +125,8 @@ public:
      *          found no failure and the application can continue working.
      *          To interrupt the application, return false.
      **/
-    virtual bool parseOptions( int argc, const char ** argv, const OptionParser::sOptionSetup * optSetup, int optCount );
-    virtual bool parseOptions( int argc, char** argv, const OptionParser::sOptionSetup* optSetup, int optCount);
+    virtual bool parseOptions( int argc, const char ** argv, const OptionParser::sOptionSetup * optSetup, uint32_t optCount );
+    virtual bool parseOptions( int argc, char** argv, const OptionParser::sOptionSetup* optSetup, uint32_t optCount);
 
     /**
      * \brief   Checks the listed options and prepares to dispatch.
@@ -232,7 +232,7 @@ public:
 
     /**
      * \brief   Sets the current command of message router service.
-     * \param   cmdService  The message router service command to set.
+     * \param   optService  The router service command option to set.
      **/
     inline void setCurrentOption( NESystemService::eServiceOption optService );
 

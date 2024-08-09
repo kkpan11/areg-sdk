@@ -23,6 +23,9 @@ include(${AREG_CMAKE_CONFIG_DIR}/user.cmake)
 if (NOT "${AREG_COMPILER_FAMILY}" STREQUAL "")
     set(CMAKE_CXX_COMPILER  "${AREG_CXX_COMPILER}")
     set(CMAKE_C_COMPILER    "${AREG_C_COMPILER}")
+    message(STATUS ">>> Set CMAKE_CXX_COMPILER compiler \'${CMAKE_CXX_COMPILER}\'")
+else()
+    message(STATUS ">>> Use system default CMAKE_CXX_COMPILER compiler \'${CMAKE_CXX_COMPILER}\'")
 endif()
 
 set(CMAKE_BUILD_TYPE    ${AREG_BUILD_TYPE})
@@ -32,7 +35,11 @@ set(CXX_STANDARD        ${AREG_CXX_STANDARD})
 # Project's properties
 set(PROJECT_NAME "areg-sdk")
 set(PROJECT_VERSION "1.5.0")
-project(${PROJECT_NAME} VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
+project("${PROJECT_NAME}" 
+        VERSION "${PROJECT_VERSION}" 
+        DESCRIPTION "AREG Communication Framework and Tools" 
+        HOMEPAGE_URL "https://aregtech.com" 
+        LANGUAGES CXX C)
 
 include(${AREG_CMAKE_CONFIG_DIR}/common.cmake)
 

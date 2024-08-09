@@ -180,7 +180,7 @@ public:
      *          There should be possibility to stream values and if VALUE is not a 
      *          primitive, but an object, it should have implemented streaming operator.
      * \param   stream  The stream to write values.
-     * \param   input   The array object containing value to stream.
+     * \param   output   The array object containing value to stream.
      **/
     template <typename V>
     friend IEOutStream & operator << (IEOutStream & stream, const TEArrayList< V > & output);
@@ -854,7 +854,7 @@ inline void TEArrayList< VALUE >::removeAt(uint32_t index, uint32_t elemCount /*
         }
         else
         {
-            ARRAYPOS last = first + elemCount;
+            ARRAYPOS last = first + static_cast<int32_t>(elemCount);
             mValueList.erase(first, last);
         }
     }
@@ -933,10 +933,10 @@ inline void TEArrayList< VALUE >::insertAt(uint32_t startAt, const std::vector< 
 
     if (newArray.empty() == false)
     {
-        uint32_t limit = 0;
+        int32_t limit = 0;
         if ((getSize() + newArray.size()) > NECommon::MAX_CONTAINER_SIZE)
         {
-            limit = NECommon::MAX_CONTAINER_SIZE - (getSize() + static_cast<uint32_t>(newArray.size()));
+            limit = static_cast<int>(NECommon::MAX_CONTAINER_SIZE - (getSize() + static_cast<uint32_t>(newArray.size())));
         }
 
         ARRAYPOS cit = getPosition(startAt);
@@ -951,7 +951,7 @@ inline int TEArrayList< VALUE >::find( const VALUE & elemSearch, uint32_t startA
     if (startAt < static_cast<uint32_t>(mValueList.size()))
     {
         result = static_cast<int>(startAt) - 1;
-        auto it = std::find_if( mValueList.begin() + startAt, mValueList.end()
+        auto it = std::find_if( mValueList.begin() + static_cast<int32_t>(startAt), mValueList.end()
                               , [&](const auto& elem) { ++result; return (elemSearch == elem);});
 
         if (it == mValueList.end())
@@ -966,7 +966,7 @@ inline int TEArrayList< VALUE >::find( const VALUE & elemSearch, uint32_t startA
 template<typename VALUE >
 inline bool TEArrayList< VALUE >::contains( const VALUE & elemSearch, uint32_t startAt /*= 0*/ ) const
 {
-    return (startAt < static_cast<uint32_t>(mValueList.size()) ? std::find(mValueList.begin() + startAt, mValueList.end(), elemSearch) != mValueList.end() : false);
+    return (startAt < static_cast<uint32_t>(mValueList.size()) ? std::find(mValueList.begin() + static_cast<int32_t>(startAt), mValueList.end(), elemSearch) != mValueList.end() : false);
 }
 
 template<typename VALUE>
@@ -981,7 +981,7 @@ inline bool TEArrayList< VALUE >::removeElem( const VALUE & elemRemove, uint32_t
     bool result = false;
     if (searchAt < static_cast<uint32_t>(mValueList.size()))
     {
-        auto it = std::find(mValueList.begin() + searchAt, mValueList.end(), elemRemove);
+        auto it = std::find(mValueList.begin() + static_cast<int>(searchAt), mValueList.end(), elemRemove);
         if (it != mValueList.end())
         {
             mValueList.erase(it);
@@ -993,20 +993,20 @@ inline bool TEArrayList< VALUE >::removeElem( const VALUE & elemRemove, uint32_t
 }
 
 template<typename VALUE >
-void TEArrayList< VALUE >::shift(uint32_t startAt, int count)
+void TEArrayList< VALUE >::shift(uint32_t startAt, int  count)
 {
     if ((mValueList.size() != 0) && (startAt < mValueList.size()) && (count != 0))
     {
         if (count > 0)
         {
-            if ((getSize() + count) > NECommon::MAX_CONTAINER_SIZE)
+            if (static_cast<uint32_t>(static_cast<int>(getSize()) + count) > NECommon::MAX_CONTAINER_SIZE)
             {
                 count = static_cast<int>(NECommon::MAX_CONTAINER_SIZE - getSize());
             }
 
             VALUE* values = mValueList.data();
             uint32_t size = static_cast<uint32_t>(mValueList.size());
-            mValueList.resize(size + count);
+            mValueList.resize(static_cast<uint32_t>(static_cast<int>(size) + count));
             NEMemory::moveElems<VALUE>(values + startAt + count, values + startAt, size - startAt);
         }
         else if (startAt != 0)
@@ -1021,7 +1021,7 @@ void TEArrayList< VALUE >::shift(uint32_t startAt, int count)
             }
 
             NEMemory::moveElems<VALUE>(values + startAt - count, values + startAt, size - startAt);
-            mValueList.resize(size - count);
+            mValueList.resize(static_cast<uint32_t>(static_cast<int>(size) - count));
         }
     }
 }
@@ -1069,7 +1069,7 @@ inline const typename TEArrayList< VALUE >::ARRAYPOS TEArrayList< VALUE >::getPo
 template<typename VALUE >
 inline typename TEArrayList< VALUE >::ARRAYPOS TEArrayList< VALUE >::getPosition(uint32_t index)
 {
-	auto it = index < static_cast<uint32_t>(mValueList.size()) ? mValueList.begin() + index : mValueList.end();
+	auto it = index < static_cast<uint32_t>(mValueList.size()) ? mValueList.begin() + static_cast<int>(index) : mValueList.end();
     return Constless<std::vector<VALUE>>::iter(mValueList, it);
 }
 

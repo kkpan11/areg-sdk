@@ -134,7 +134,6 @@ TEST(FixedArrayTest, TestValues)
     using FixedArray = TEFixedArray<int>;
     constexpr uint32_t elemCount{ 10u };
     constexpr int32_t arr[]{ 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
-    constexpr int len{ MACRO_ARRAYLEN(arr) };
 
     FixedArray notEmpty(elemCount);
     const int* dst = notEmpty.getValues();
@@ -164,15 +163,15 @@ TEST(FixedArrayTest, TestSearchElem)
 
     for (uint32_t i = 0; i < notEmpty.getSize(); ++i)
     {
-        EXPECT_TRUE(notEmpty.contains(i, 0));
-        EXPECT_TRUE(notEmpty.contains(i, i));
-        EXPECT_FALSE(notEmpty.contains(i, i + 1));
-        EXPECT_FALSE(notEmpty.contains(i + elemCount, 0));
+        EXPECT_TRUE(notEmpty.contains(static_cast<int>(i), 0u));
+        EXPECT_TRUE(notEmpty.contains(static_cast<int>(i), i));
+        EXPECT_FALSE(notEmpty.contains(static_cast<int>(i), i + 1u));
+        EXPECT_FALSE(notEmpty.contains(static_cast<int>(i + elemCount), 0u));
 
-        EXPECT_EQ(notEmpty.find(i, 0), i);
-        EXPECT_EQ(notEmpty.find(i, i), i);
-        EXPECT_EQ(notEmpty.find(i, i + elemCount), static_cast<uint32_t>(NECommon::INVALID_INDEX));
-        EXPECT_EQ(notEmpty.find(i + elemCount, 0), static_cast<uint32_t>(NECommon::INVALID_INDEX));
+        EXPECT_EQ(notEmpty.find(static_cast<int>(i), 0u), static_cast<int>(i));
+        EXPECT_EQ(notEmpty.find(static_cast<int>(i), i), static_cast<int>(i));
+        EXPECT_EQ(notEmpty.find(static_cast<int>(i), i + elemCount), NECommon::INVALID_INDEX);
+        EXPECT_EQ(notEmpty.find(static_cast<int>(i + elemCount), 0u), NECommon::INVALID_INDEX);
     }
 }
 

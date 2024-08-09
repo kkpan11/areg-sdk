@@ -24,7 +24,7 @@ namespace
     {
         if ( (argv != nullptr) && (argc > 1) )
         {
-            for ( int i = 1; i < static_cast<int>(argc); ++i )
+            for ( int i = 1; i < argc; ++i )
             {
                 const CharType * opt = argv[i];
                 if (NEString::isEmpty<CharType>(opt))
@@ -40,7 +40,7 @@ namespace
     {
         if ((argv != nullptr) && (argc > 1))
         {
-            for (int i = 1; i < static_cast<int>(argc); ++i)
+            for (int i = 1; i < argc; ++i)
             {
                 const CharType* opt = argv[i];
                 if (NEString::isEmpty<CharType>(opt))
@@ -217,14 +217,14 @@ OptionParser::OptionParser( std::vector<sOptionSetup> && initList ) noexcept
     }
 }
 
-OptionParser::OptionParser( const sOptionSetup * initEntries, int count )
+OptionParser::OptionParser( const sOptionSetup * initEntries, uint32_t count )
     : mCmdLine      ( )
     , mSetupOptions ( )
     , mInputOptions ( )
 {
     if ( initEntries != nullptr )
     {
-        for ( int i = 0; i < count; ++ i )
+        for ( uint32_t i = 0; i < count; ++ i )
         {
             mSetupOptions.add(initEntries[ i ]);
         }
@@ -274,31 +274,31 @@ OptionParser & OptionParser::operator=( OptionParser && src ) noexcept
     return (*this);
 }
 
-bool OptionParser::parseCommandLine( const char ** cmdLine, int count )
+bool OptionParser::parseCommandLine( const char ** cmdLine, uint32_t count )
 {
     StrList optList;
-    _convertArguments<char>( cmdLine, count, optList );
+    _convertArguments<char>( cmdLine, static_cast<int>(count), optList );
     return parseOptions( optList );
 }
 
-bool OptionParser::parseCommandLine( const wchar_t ** cmdLine, int count )
+bool OptionParser::parseCommandLine( const wchar_t ** cmdLine, uint32_t count )
 {
     StrList optList;
-    _convertArguments<wchar_t>( cmdLine, count, optList );
+    _convertArguments<wchar_t>( cmdLine, static_cast<int>(count), optList );
     return parseOptions( optList );
 }
 
-bool OptionParser::parseCommandLine(char** cmdLine, int count)
+bool OptionParser::parseCommandLine(char** cmdLine, uint32_t count)
 {
     StrList optList;
-    _convertArguments<char>(cmdLine, count, optList);
+    _convertArguments<char>(cmdLine, static_cast<int>(count), optList);
     return parseOptions(optList);
 }
 
-bool OptionParser::parseCommandLine(wchar_t** cmdLine, int count)
+bool OptionParser::parseCommandLine(wchar_t** cmdLine, uint32_t count)
 {
     StrList optList;
-    _convertArguments<wchar_t>(cmdLine, count, optList);
+    _convertArguments<wchar_t>(cmdLine, static_cast<int>(count), optList);
     return parseOptions(optList);
 }
 
@@ -352,8 +352,8 @@ bool OptionParser::parseOptions( StrList & optList )
             {
                 sOption & last = mInputOptions.lastEntry();
                 ASSERT( last.inRefSetup != NECommon::INVALID_INDEX );
-                _setInputValue( input, last, last.inRefSetup );
-                result = OptionParser::hasInputError( last.inField ) == false;
+                _setInputValue( input, last, static_cast<uint32_t>(last.inRefSetup) );
+                result = OptionParser::hasInputError( static_cast<uint32_t>(last.inField) ) == false;
             }
             else if ( mSetupOptions.isEmpty() == false)
             {
@@ -382,7 +382,7 @@ bool OptionParser::parseOptions( StrList & optList )
         else 
         {
             mInputOptions.add( opt );
-            result = OptionParser::hasInputError( opt.inField ) == false;
+            result = OptionParser::hasInputError( static_cast<uint32_t>(opt.inField) ) == false;
         }
     }
 
@@ -397,7 +397,7 @@ OptionParser::sOption OptionParser::_setupInput( bool isShort, String cmdLine, u
     OptionParser::sOption opt;
     opt.inField     = setup.optField;
     opt.inCommand   = setup.optCmmand;
-    opt.inRefSetup  = refSetup;
+    opt.inRefSetup  = static_cast<int32_t>(refSetup);
 
     cmdLine.substring( static_cast<NEString::CharPos>(isShort ? setup.optShort.length() : setup.optLong.length()) );
     cmdLine.trimAll( );
